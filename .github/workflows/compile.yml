@@ -70,3 +70,42 @@ jobs:
           dotnet run
           cd -
         done
+
+    # Compress compiled files
+    - name: Compress compiled files
+      run: |
+        mkdir -p build/all
+        cp -r build/cpp build/all/
+        cp -r build/kotlin build/all/
+        cp -r build/cs build/all/
+        cd build
+        zip -r compiled_programs.zip all
+
+    # Upload artifact
+    - name: Upload artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: compiled_programs
+        path: build/compiled_programs.zip
+
+    # Create GitHub release
+    - name: Create GitHub Release
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: v1.0.0
+        release_name: Compiled Programs Release
+        draft: false
+        prerelease: false
+
+    # Upload release asset
+    - name: Upload Release Asset
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: build/compiled_programs.zip
+        asset_name: compiled_programs.zip
+        asset_content_type: application/zip
