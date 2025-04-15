@@ -51,11 +51,11 @@ jobs:
           java -jar build/kotlin/$(basename $file .kt).jar
         done
 
-    # Install .NET SDK for C# compilation
-    - name: Install .NET SDK
-      run: |
-        sudo apt-get update
-        sudo apt-get install -y dotnet-sdk-6.0
+    # Install c# compiler
+    - name: Install c# compiler
+      uses: actions/setup-dotnet@v3
+      with:
+        dotnet-version: '7.0.x'
 
     # Compile and execute C# files
     - name: Compile and Execute C# files
