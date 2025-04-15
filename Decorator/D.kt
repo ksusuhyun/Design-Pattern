@@ -1,4 +1,4 @@
-// open class는 클래스와 메서드가 상속 및 오버라이드될 수 있도록 허용한다.
+// open class는 클래스와 메서드가 상속 및 오버라이드될 수 있도록 허용한다!
 open class Coffee {
     open fun cost(): Int {
         return 5
