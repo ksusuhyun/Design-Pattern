@@ -1,0 +1,71 @@
+name: Compile and Release
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    name: Build and Archive
+    runs-on: ubuntu-latest
+
+    steps:
+    # Checkout the repository
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    # Compile C++ files
+    - name: Compile C++ files
+      run: |
+        mkdir -p build/cpp
+        for file in $(find . -name "*.cpp"); do
+          g++ $file -o build/cpp/$(basename $file .cpp)
+        done
+
+    # Compile C# files
+    - name: Compile C# files
+      run: |
+        mkdir -p build/cs
+        for file in $(find . -name "*.cs"); do
+          mcs $file -out:build/cs/$(basename $file .cs).exe
+        done
+
+    # Compile Kotlin files
+    - name: Compile Kotlin files
+      run: |
+        mkdir -p build/kotlin
+        for file in $(find . -name "*.kt"); do
+          kotlinc $file -include-runtime -d build/kotlin/$(basename $file .kt).jar
+        done
+
+    # Compress compiled files
+    - name: Archive compiled files
+      run: |
+        mkdir -p artifacts
+        zip -r artifacts/compiled_projects.zip build/
+
+    # Upload the artifact to GitHub Releases
+    - name: Create Release
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: v1.0.${{ github.run_number }}
+        release_name: "Compiled Projects Release"
+        body: "This release contains compiled projects."
+        draft: false
+        prerelease: false
+
+    - name: Upload Release Asset
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: artifacts/compiled_projects.zip
+        asset_name: compiled_projects.zip
+        asset_content_type: application/zip
