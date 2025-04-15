@@ -67,6 +67,6 @@ jobs:
           dotnet new console -n $project_name -o build/cs/$project_name
           mv $file build/cs/$project_name/Program.cs
           cd build/cs/$project_name
-          dotnet run
+          dotnet run --nologo > /dev/null 2>&1
           cd -
         done

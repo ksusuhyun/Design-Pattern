@@ -25,6 +25,7 @@ namespace FactoryMethod {
             } else if (animalType == "Cat") {
                 return new Cat();
             }
+            throw new ArgumentException($"Unknown animal type: {animalType}");
         }
     }
 
