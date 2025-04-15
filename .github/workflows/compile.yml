@@ -1,4 +1,4 @@
-name: Compile and Release
+name: Compile and Execute
 
 on:
   push:
@@ -10,7 +10,7 @@ on:
 
 jobs:
   build:
-    name: Build and Archive
+    name: Build, Execute, and Archive
     runs-on: ubuntu-latest
 
     steps:
@@ -18,54 +18,50 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v3
 
-    # Compile C++ files
-    - name: Compile C++ files
+    # Install C++ compiler
+    - name: Install C++ Compiler
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y g++
+
+    # Compile and execute C++ files
+    - name: Compile and Execute C++ files
       run: |
         mkdir -p build/cpp
         for file in $(find . -name "*.cpp"); do
           g++ $file -o build/cpp/$(basename $file .cpp)
+          ./build/cpp/$(basename $file .cpp)
         done
 
-    # Compile C# files
-    - name: Compile C# files
+    # Install .NET SDK for C# compilation
+    - name: Install .NET SDK
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y dotnet-sdk-6.0
+
+    # Compile and execute C# files
+    - name: Compile and Execute C# files
       run: |
         mkdir -p build/cs
         for file in $(find . -name "*.cs"); do
-          mcs $file -out:build/cs/$(basename $file .cs).exe
+          dotnet build $file -o build/cs
+          dotnet run --project $file
         done
 
-    # Compile Kotlin files
-    - name: Compile Kotlin files
+    # Install Kotlin compiler
+    - name: Install Kotlin Compiler
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y default-jdk
+        curl -s https://get.sdkman.io | bash
+        source "$HOME/.sdkman/bin/sdkman-init.sh"
+        sdk install kotlin
+
+    # Compile and execute Kotlin files
+    - name: Compile and Execute Kotlin files
       run: |
         mkdir -p build/kotlin
         for file in $(find . -name "*.kt"); do
           kotlinc $file -include-runtime -d build/kotlin/$(basename $file .kt).jar
+          java -jar build/kotlin/$(basename $file .kt).jar
         done
-
-    # Compress compiled files
-    - name: Archive compiled files
-      run: |
-        mkdir -p artifacts
-        zip -r artifacts/compiled_projects.zip build/
-
-    # Upload the artifact to GitHub Releases
-    - name: Create Release
-      uses: actions/create-release@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        tag_name: v1.0.${{ github.run_number }}
-        release_name: "Compiled Projects Release"
-        body: "This release contains compiled projects."
-        draft: false
-        prerelease: false
-
-    - name: Upload Release Asset
-      uses: actions/upload-release-asset@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: artifacts/compiled_projects.zip
-        asset_name: compiled_projects.zip
-        asset_content_type: application/zip
