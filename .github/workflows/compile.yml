@@ -88,24 +88,14 @@ jobs:
         name: compiled_programs
         path: build/compiled_programs.zip
 
-    # Create GitHub release
+    # Create GitHub release and upload asset
     - name: Create GitHub Release
-      uses: actions/create-release@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      uses: ncipollo/release-action@v1
       with:
-        tag_name: v1.0.0
-        release_name: Compiled Programs Release
+        tag: v1.0.0
+        name: Compiled Programs Release
+        body: |
+          This release contains the compiled programs for C++, Kotlin, and C#.
         draft: false
         prerelease: false
-
-    # Upload release asset
-    - name: Upload Release Asset
-      uses: actions/upload-release-asset@v2
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        upload_url: ${{ steps.create-release.outputs.upload_url }}
-        asset_path: build/compiled_programs.zip
-        asset_name: compiled_programs.zip
-        asset_content_type: application/zip
+        artifacts: build/compiled_programs.zip
