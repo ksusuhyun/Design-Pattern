@@ -33,21 +33,6 @@ jobs:
           ./build/cpp/$(basename $file .cpp)
         done
 
-    # Install .NET SDK for C# compilation
-    - name: Install .NET SDK
-      run: |
-        sudo apt-get update
-        sudo apt-get install -y dotnet-sdk-6.0
-
-    # Compile and execute C# files
-    - name: Compile and Execute C# files
-      run: |
-        mkdir -p build/cs
-        for file in $(find . -name "*.cs"); do
-          dotnet build $file -o build/cs
-          dotnet run --project $file
-        done
-
     # Install Kotlin compiler
     - name: Install Kotlin Compiler
       run: |
@@ -64,4 +49,19 @@ jobs:
         for file in $(find . -name "*.kt"); do
           kotlinc $file -include-runtime -d build/kotlin/$(basename $file .kt).jar
           java -jar build/kotlin/$(basename $file .kt).jar
+        done
+
+    # Install .NET SDK for C# compilation
+    - name: Install .NET SDK
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y dotnet-sdk-6.0
+
+    # Compile and execute C# files
+    - name: Compile and Execute C# files
+      run: |
+        mkdir -p build/cs
+        for file in $(find . -name "*.cs"); do
+          dotnet build $file -o build/cs
+          dotnet run --project $file
         done
