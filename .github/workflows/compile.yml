@@ -91,6 +91,8 @@ jobs:
     # Create GitHub release and upload asset
     - name: Create GitHub Release
       uses: ncipollo/release-action@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         tag: v1.0.0
         name: Compiled Programs Release
