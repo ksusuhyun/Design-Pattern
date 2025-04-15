@@ -101,3 +101,5 @@ jobs:
         draft: false
         prerelease: false
         artifacts: build/compiled_programs.zip
+        replacesArtifacts: true
+        skipIfReleaseExists: false
