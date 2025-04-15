@@ -94,12 +94,10 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
-        tag: v1.0.0
-        name: Compiled Programs Release
+        tag: v1.0.0-${{ github.run_id }}
+        name: Compiled Programs Release (Run ${{ github.run_id }})
         body: |
           This release contains the compiled programs for C++, Kotlin, and C#.
         draft: false
         prerelease: false
         artifacts: build/compiled_programs.zip
-        replacesArtifacts: true
-        skipIfReleaseExists: false
