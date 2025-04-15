@@ -62,6 +62,11 @@ jobs:
       run: |
         mkdir -p build/cs
         for file in $(find . -name "*.cs"); do
-          dotnet build $file -o build/cs
-          dotnet run --project $file
+          project_name=$(basename $file .cs)
+          mkdir -p build/cs/$project_name
+          dotnet new console -n $project_name -o build/cs/$project_name
+          mv $file build/cs/$project_name/Program.cs
+          cd build/cs/$project_name
+          dotnet run
+          cd -
         done
